@@ -1,0 +1,105 @@
+SETUP:
+-First, map the shared folder to a network drive.  In file explorer on 'this PC', click 'computer' at the top, and click map network drive
+-Pick a drive letter EG 'V' and paste the shared folder into the directory
+-Then create a shortcut and copy it to desktop
+-If you use drive letter V, you can copy the existing shortcut
+
+USAGE:
+-Run 'VM_Manager.bat' to open program
+-If Server List file gets messed up there is a backup of original
+-There is only basic input validation on form so avoid special chars for now
+-Let me (Sam De) know if you find issues so I can fix, including spelling mistakes, which are many...
+
+ADD NEW VMs:
+-To add a new server to this tool, click the add button at the bottom of the server list and use the UI to enter details
+-The VM will need group pilocy setting so it auto-logs of disconnected users after 5 mins, and idle after an hour
+-VM's registary needs to be configured to allow remote RPC:
+
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server
+
+-and change AllowRemoteRPC from 0 to the 1
+
+TODO LIST:
+-**Now JS is all on one file, a lot of my code is redundent so need to re-write.  I dont need to hack variable sharing via temp files if its all on one page...........**
+-Need some way to check serverList.txt is formatted correctly
+-Could add a check so that a server must return a positive qwinsta query before it can be added to list (wont work for connections where username and password is unknown, or policy blocks RPC like web server)
+-Add functionality to management page, such as updating username and password
+-Need to improve input validation to protect against code injection.  Should at least escape special chars
+-Decide whether to keep the 2 example VMs hard coded or make them part of external file
+-Could look at combining management page with connection page, not really a reason to have 2 pages (tho it makes the code a lot easier, as updating the temp files would be a pain)
+-If I want to include automatic sign on for secure connections, like the web server, I need to encrypt the password storage
+-My Functions are mostly written out of order.  JS is asynchronous so works fine but hard to read.
+-If I change findstr to JS, I can have to look for 'active' next to session name, and would not need session to end when disconnected 
+-Should change the alert when connecting to VM, either remove it or add a cancel option
+-Look at changing file extentions to .hta rather than .bat, might solve some of my issues with cmd window being active
+-Add a feature to list customers and connect to correct COM server!
+-At some point, I need to decide on terminology.  Is this program for connecting to VM's or remote systems or servers?  Maybe should just call them 'Connections'?
+-My main table could be formatted better so it looks clean on different monitor sizes
+-Add a feedback button? :S
+
+BUG LIST:
+-Issue if 2 people loading at same time.  Fine to start new instance once first is fully loaded.  Could implement a loading queue? Or save temp- path to ProgramData?
+-Loading spiner vibrates slightly
+-Slight pause when first opening might be due to loading in bootstrap components it does not need.  Should look at minifying this or making a custom library
+
+VERSION NOTES:
+V2 Notes:  
+-I have added visual feedback when page is refreshing.
+-Have removed some redundent code.
+
+V3 Notes:
+-Have added some error checking to the QWINSTA query so program knows when VM is offline
+
+V4 Notes:
+-Have changed a lot of code to allow table to update to VMList length dynamically
+-Have changed how VM's are stored so they are now picked up from external file
+
+V5 Notes:
+-Added dynamic VM name so it pulls from file
+-Have created a basic UI for adding new VMs
+-Currently have no input checks so would be very easy to inject code.  Need to add proper form checks
+
+V6 Notes:
+-Added some basic input validation, so all boxes need filling and IP address must be valid
+-Added a table to show the new VMs added in that session
+-Added the ability to remove VMs from file.  Seems pretty robust, not yet been able to break it
+-Made add VM page into a VM management UI
+
+V7 Notes
+-Have split qwinsta batch so each VM is queried at same time.  Speeds up loading considerably.  This involved a lot of code change so need to look for bugs
+-Fixed bug when trying to remove example VMs
+-General code cleanup and refactoring (no code outside of functions etc)
+-Added comments to every part of code
+
+V8 Notes
+-Have removed the VMList array containing the IP addresses as it was duplicating data from main VMDetail array.  This removed a lot of code syncing the 2 arrays
+-Have swapped the loading screen over to bootstrap to make it more consistant with rest of UI
+
+V9 Notes
+-Might have solved bug where some loading responces are missed by giving each VM its own loading file
+-Have swapped all temp files over to user %tmp% file to allow multiple users on app server
+-Cleaned up some hacky code, added comments, removed old commented code, removed unnecessary vars, improved indentation, improved code style consistancy 
+-Changed lable for manage VM button
+
+V10 Notes
+-**Have moved almost all JS to a single file being referenced by the hta's**
+-Have removed the table showing newly added VM's.  Think this looks better but not yet sure
+-Added a prompt to use space for non test VM connecitons.  Looks a bit janky atm
+-Reverted changes to main batch logic to implement a single JS file.  Will look to move logic to JS in V11
+-(Fixed):"-Look at bug causing addVm page to appear behind the CMD window that opened it"
+-(fixed):"-Look into bug where loading file only contains some responces.  Issue with 4 scripts trying to write to same file at once?"
+
+V11 Notes:
+-Most logic moved from batch to JS
+-Re-written logic to show all user sessions and whether they are active, disconnected or Idle
+-Fixed refresh spinner
+-Improved logic for making connection
+-Added an auto-refresh, currently set to 5 mins
+-Fixed a bug causing program to refresh constantly in a progressivly faster loop.  Was using setInterval instead of setTimeout 
+-Added some explainer text to addVM screen.
+-(Fixed) -Look into bug causing infinate loop when checking loaded.txt (I know what causes the loop, I dont know how its working without the line that causes it!!!)
+-(Fixed I think) -Look into bug where it loads instantly without querying VMs.  Think I just need to play with the delay before it looks at the loaded files
+-Lots of improvements to readability of code
+-Fixed a few minor things like program restarting instead of refreshing, clearing files it needed still when moving to addVM page and the actual connection logic was badly written so sometimes failed
+-Added some tooltips and explainers
+-Changed the mesages for whether conneciton is available

@@ -1,0 +1,7 @@
+VM Name,VM IP Address,VM Username,VM Password
+Branch 2 of HO 1,192.168.80.4,Test,test
+Head Office 2,192.168.80.21,test,test
+Branch 1 of HO 2,192.168.80.22,test,test
+Delphi Dev,192.168.80.25,Administrator,Password99
+Remote Desktop,10.150.0.7, , 
+Web Server,86.54.149.148, , 
